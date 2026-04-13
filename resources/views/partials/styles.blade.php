@@ -426,11 +426,14 @@
     ============================================ */
     .auth-body {
         min-height: 100vh;
-        background: var(--paper);
+        background: var(--ink);
+        margin: 0;
+        padding: 0;
     }
 
     .auth-main {
         min-height: 100vh;
+        width: 100%;
         display: grid;
         grid-template-columns: 1fr 1fr;
     }
@@ -440,6 +443,7 @@
         flex-direction: column;
         justify-content: center;
         padding: clamp(2rem, 6vw, 5rem);
+        min-height: 100vh;
     }
 
     .auth-panel-left {
@@ -451,6 +455,8 @@
     .auth-panel-right {
         background: var(--white);
         overflow-y: auto;
+        /* Always fills its column at full height */
+        min-height: 100vh;
     }
 
     /* Left panel decorative elements */
@@ -901,13 +907,9 @@
         font-size: 0.875rem;
         color: var(--ink-muted);
         line-height: 1.65;
-
         display: -webkit-box;
-        -webkit-box-orient: vertical;
-
         -webkit-line-clamp: 3;
-        line-clamp: 3; /* Standard property for future compatibility */
-
+        -webkit-box-orient: vertical;
         overflow: hidden;
     }
 
@@ -1047,8 +1049,9 @@
         .posts-grid.featured { grid-template-columns: 1fr; }
         .posts-grid.featured .post-card:first-child { grid-row: span 1; }
 
-        .auth-main { grid-template-columns: 1fr; }
+        .auth-main { grid-template-columns: 1fr; background: var(--white); }
         .auth-panel-left { display: none; }
+        .auth-panel-right { min-height: 100vh; width: 100%; }
 
         .hero-inner { grid-template-columns: 1fr; }
         .hero-visual { display: none; }

@@ -15,6 +15,13 @@
     {{-- Styles --}}
     @include('partials.styles')
 
+    <style>
+        /* Auth-specific overrides: ensure truly full-bleed layout */
+        html, body { height: 100%; margin: 0; padding: 0; }
+        body.auth-body { display: flex; flex-direction: column; }
+        .auth-main { flex: 1; min-height: 100vh; }
+    </style>
+
     @stack('head')
 </head>
 <body class="auth-body">
@@ -22,10 +29,8 @@
     {{-- Flash Messages --}}
     @include('partials.flash')
 
-    {{-- Auth Content --}}
-    <main class="auth-main">
-        @yield('content')
-    </main>
+    {{-- Auth Content — pages render their own .auth-main grid --}}
+    @yield('content')
 
     {{-- Scripts --}}
     @include('partials.scripts')
