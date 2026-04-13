@@ -45,7 +45,7 @@
     <div class="auth-panel auth-panel-right">
         <div class="auth-form-wrap">
 
-            <h1>Create Account</h1>
+            <h1>Create Account</h1><br><br>
             <p class="subtitle">Free to join. Start writing in minutes.</p>
 
             <form method="POST" action="{{ route('register') }}" class="auth-form" novalidate>
