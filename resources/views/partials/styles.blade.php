@@ -901,9 +901,13 @@
         font-size: 0.875rem;
         color: var(--ink-muted);
         line-height: 1.65;
+
         display: -webkit-box;
-        -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
+
+        -webkit-line-clamp: 3;
+        line-clamp: 3; /* Standard property for future compatibility */
+
         overflow: hidden;
     }
 
