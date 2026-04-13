@@ -22,6 +22,14 @@ class BlogController extends Controller
 
     public function show(Request $request, $id)
     {
+        if (!is_numeric($id)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid blog ID',
+                'data' => null
+            ], 400);
+        }
+
         $blog = Blog::where('id', $id)
             ->where('user_id', $request->user()->id)
             ->first();
@@ -45,7 +53,7 @@ class BlogController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'featured_image' => 'nullable|string',
+            'featured_image' => 'nullable|url',
             'content' => 'required|string',
         ]);
 
@@ -77,13 +85,6 @@ class BlogController extends Controller
 
     public function update(Request $request, $id)
     {
-
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'featured_image' => 'nullable|string',
-            'content' => 'required|string',
-        ]);
-
         $blog = Blog::where('id', $id)
             ->where('user_id', $request->user()->id)
             ->first();
@@ -92,7 +93,18 @@ class BlogController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Blog not found',
+                'data' => null
             ], 404);
+        }
+
+        $validated = $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'featured_image' => 'nullable|url',
+            'content' => 'sometimes|required|string',
+        ]);
+
+        if (isset($validated['title'])) {
+            $validated['slug'] = $this->generateUniqueSlug($validated['title']);
         }
 
         $blog->update($validated);
