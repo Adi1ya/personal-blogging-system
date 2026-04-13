@@ -12,7 +12,14 @@ class Blog extends Model
         'slug',
         'content',
         'featured_image',
+        'category',
+        'tags',
         'is_publised',
         'published_at'
+    ];
+
+    protected $casts = [
+        'tags' => 'array',
+        'published_at' => 'datetime'
     ];
 }
