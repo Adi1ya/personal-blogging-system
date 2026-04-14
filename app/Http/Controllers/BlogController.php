@@ -11,7 +11,9 @@ class BlogController extends Controller
 
     public function index(Request $request)
     {
-        $blogs = Blog::where('user_id', $request->user()->id)->get();
+        $blogs = Blog::where('user_id', $request->user()->id)
+            ->where('is_deleted', 0)
+            ->get();
 
         return response()->json([
             'status' => true,
@@ -32,6 +34,7 @@ class BlogController extends Controller
 
         $blog = Blog::where('id', $id)
             ->where('user_id', $request->user()->id)
+            ->where('is_deleted', 0)
             ->first();
 
         if (!$blog) {
@@ -53,12 +56,14 @@ class BlogController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'featured_image' => 'nullable|url',
             'content' => 'required|string',
+            'featured_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'category' => 'required|string|max:100',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string|max:50',
         ]);
 
         $validated['user_id'] = $request->user()->id;
-
         $validated['slug'] = $this->generateUniqueSlug($validated['title']);
 
         $blog = Blog::create($validated);
@@ -87,6 +92,7 @@ class BlogController extends Controller
     {
         $blog = Blog::where('id', $id)
             ->where('user_id', $request->user()->id)
+            ->where('is_deleted', 0)
             ->first();
 
         if (!$blog) {
@@ -99,8 +105,11 @@ class BlogController extends Controller
 
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
-            'featured_image' => 'nullable|url',
             'content' => 'sometimes|required|string',
+            'featured_image' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'category' => 'sometimes|required|string|max:100',
+            'tags' => 'sometimes|nullable|array',
+            'tags.*' => 'string|max:50',
         ]);
 
         if (isset($validated['title'])) {
@@ -118,20 +127,18 @@ class BlogController extends Controller
 
     public function destroy(Request $request, $id)
     {
-
-        $blog = Blog::where('id', $id)
+        $updated = Blog::where('id', $id)
             ->where('user_id', $request->user()->id)
-            ->first();
+            ->where('is_deleted', 0)
+            ->update(['is_deleted' => 1]);
 
-        if (!$blog) {
+        if (!$updated) {
             return response()->json([
                 'status' => false,
                 'message' => 'Blog not found',
                 'data' => null
             ], 404);
         }
-
-        $blog->delete();
 
         return response()->json([
             'status' => true,
