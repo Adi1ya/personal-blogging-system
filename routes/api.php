@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
@@ -26,5 +25,16 @@ Route::prefix('v1')->group(function () {
         Route::delete('/authors/{author}/unfollow', [EngagementController::class, 'unfollow']);
         Route::get('/authors/{author}/followers', [EngagementController::class, 'followers']);
         Route::get('/me/following', [EngagementController::class, 'following']);
+
+        Route::post('/blogs/{blog}/like', [EngagementController::class, 'like']);
+        Route::delete('/blogs/{blog}/like', [EngagementController::class, 'removeLike']);
+        Route::get('/blogs/{blog}/like', [EngagementController::class, 'listLikes']);
+        Route::post('/blogs/{blog}/dislike', [EngagementController::class, 'dislike']);
+        Route::delete('/blogs/{blog}/dislike', [EngagementController::class, 'removeDislike']);
+        Route::get('/blogs/{blog}/dislike', [EngagementController::class, 'listDislikes']);
+        Route::post('/blogs/{blog}/comments', [EngagementController::class, 'storeComment']);
+        Route::get('/blogs/{blog}/comments', [EngagementController::class, 'listComments']);
+        Route::get('/blogs/{blog}/comments/{comment}', [EngagementController::class, 'show']);
+        Route::delete('/blogs/{blog}/comments/{comment}', [EngagementController::class, 'destroy']);
     });
 });
