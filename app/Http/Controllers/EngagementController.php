@@ -71,7 +71,7 @@ class EngagementController extends Controller
         ], 200);
     }
 
-    public function followers(Request $request, User $author)
+    public function followers(User $author)
     {
         $followers = Follow::where('author_id', $author->id)
             ->get();
