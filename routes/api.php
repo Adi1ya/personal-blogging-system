@@ -4,16 +4,22 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\EngagementController;
+use App\Http\Controllers\PublicContentController;
 
 Route::prefix('v1')->group(function () {
     // Public routes
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/public/blogs', [PublicContentController::class, 'index']);
+    Route::get('/public/blogs/{blog:slug}', [PublicContentController::class, 'show']);
+    Route::get('/public/profiles/{user}', [PublicContentController::class, 'profile']);
+    Route::get('/public/categories', [PublicContentController::class, 'categories']);
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/me', [PublicContentController::class, 'me']);
 
         Route::get('/blogs', [BlogController::class, 'index']);
         Route::get('/blogs/{id}', [BlogController::class, 'show']);

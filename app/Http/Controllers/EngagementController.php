@@ -77,13 +77,19 @@ class EngagementController extends Controller
     public function followers(User $author)
     {
         $followers = Follow::where('author_id', $author->id)
+            ->with('follower:id,name,email')
             ->get();
 
         return response()->json([
             'status' => true,
             'message' => 'Followers fetched successfully',
             'data' => [
-                'followers' => count($followers)
+                'count' => $followers->count(),
+                'followers' => $followers->map(fn (Follow $follow) => [
+                    'id' => $follow->follower?->id,
+                    'name' => $follow->follower?->name,
+                    'email' => $follow->follower?->email,
+                ])->values(),
             ]
         ], 200);
     }
@@ -91,13 +97,19 @@ class EngagementController extends Controller
     public function following(Request $request)
     {
         $following = Follow::where('follower_id', $request->user()->id)
+            ->with('author:id,name,email')
             ->get();
 
         return response()->json([
             'status' => true,
             'message' => 'Following list fetched successfully',
             'data' => [
-                'following' => count($following)
+                'count' => $following->count(),
+                'following' => $following->map(fn (Follow $follow) => [
+                    'id' => $follow->author?->id,
+                    'name' => $follow->author?->name,
+                    'email' => $follow->author?->email,
+                ])->values(),
             ]
         ], 200);
     }
@@ -130,8 +142,7 @@ class EngagementController extends Controller
 
     public function listLikes(Request $request, Blog $blog)
     {
-        $likes = BlogReaction::where('user_id', $request->user()->id)
-            ->where('blog_id', $blog->id)
+        $likes = BlogReaction::where('blog_id', $blog->id)
             ->where('type', 'like')
             ->get();
 
@@ -139,7 +150,8 @@ class EngagementController extends Controller
             'status' => true,
             'message' => 'Likes fetched successfully',
             'data' => [
-                'likes' => count($likes)
+                'likes' => count($likes),
+                'has_liked' => $likes->contains('user_id', $request->user()->id),
             ]
         ], 200);
     }
@@ -185,8 +197,7 @@ class EngagementController extends Controller
 
     public function listDislikes(Request $request, Blog $blog)
     {
-        $dislikes = BlogReaction::where('user_id', $request->user()->id)
-            ->where('blog_id', $blog->id)
+        $dislikes = BlogReaction::where('blog_id', $blog->id)
             ->where('type', 'dislike')
             ->get();
 
@@ -194,7 +205,8 @@ class EngagementController extends Controller
             'status' => true,
             'message' => 'Dislikes fetched successfully',
             'data' => [
-                'dislikes' => count($dislikes)
+                'dislikes' => count($dislikes),
+                'has_disliked' => $dislikes->contains('user_id', $request->user()->id),
             ]
         ], 200);
     }
@@ -220,14 +232,26 @@ class EngagementController extends Controller
 
     public function listComments(Request $request, Blog $blog)
     {
-        $comments = Comment::where('user_id', $request->user()->id)
+        $comments = Comment::where('blog_id', $blog->id)
+            ->with('user:id,name,email')
             ->where('blog_id', $blog->id)
+            ->latest()
             ->get();
 
         return response()->json([
             'status' => true,
             'message' => 'Comments fetched successfully',
-            'data' => $comments
+            'data' => $comments->map(fn (Comment $comment) => [
+                'id' => $comment->id,
+                'comment' => $comment->comment,
+                'created_at' => optional($comment->created_at)->toISOString(),
+                'user' => [
+                    'id' => $comment->user?->id,
+                    'name' => $comment->user?->name,
+                    'email' => $comment->user?->email,
+                ],
+                'is_owner' => $comment->user_id === $request->user()->id,
+            ])
         ], 200);
     }
 

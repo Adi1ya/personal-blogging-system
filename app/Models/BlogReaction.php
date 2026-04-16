@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BlogReaction extends Model
 {
@@ -11,4 +12,14 @@ class BlogReaction extends Model
         'blog_id',
         'type'
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function blog(): BelongsTo
+    {
+        return $this->belongsTo(Blog::class);
+    }
 }
