@@ -146,4 +146,65 @@ class BlogController extends Controller
             'data' => null
         ], 200);
     }
+
+    public function publish(Request $request, Blog $blog)
+    {
+        if ($blog->user_id !== $request->user()->id || $blog->is_deleted) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Blog not found',
+                'data' => null
+            ], 404);
+        }
+
+        $blog->update([
+            'is_published' => 1
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Blog published successfully',
+            'data' => $blog
+        ], 200);
+    }
+
+    public function searchByTag($tag)
+    {
+        validator(['tag' => $tag], [
+            'tag' => 'required|string|max:50|alpha_dash'
+        ])->validate();
+
+        $tag = strtolower($tag);
+
+        $blogs = Blog::where('is_deleted', 0)
+            ->where('is_published', 1)
+            ->whereJsonContains('tags', $tag)
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Blogs fetched successfully',
+            'data' => $blogs
+        ], 200);
+    }
+
+    public function searchByCategory($category)
+    {
+        validator(['category' => $category], [
+            'category' => 'required|string|max:50|alpha_dash'
+        ])->validate();
+
+        $category = strtolower($category);
+
+        $blogs = Blog::where('is_deleted', 0)
+            ->where('is_published', 1)
+            ->where('category', $category)
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Blogs fetched successfully',
+            'data' => $blogs
+        ], 200);
+    }
 }

@@ -20,6 +20,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/blogs', [BlogController::class, 'store']);
         Route::patch('/blogs/{id}', [BlogController::class, 'update']);
         Route::delete('/blogs/{id}', [BlogController::class, 'destroy']);
+        Route::post('blogs/{blog}/publish', [BlogController::class, 'publish']);
+        Route::get('/blogs/tags/{tag}', [BlogController::class, 'searchByTag']);
+        Route::get('/blogs/categories/{category}', [BlogController::class, 'searchByCategory']);
 
         Route::post('/authors/{author}/follow', [EngagementController::class, 'follow']);
         Route::delete('/authors/{author}/unfollow', [EngagementController::class, 'unfollow']);

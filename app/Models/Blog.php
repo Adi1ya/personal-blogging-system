@@ -14,7 +14,7 @@ class Blog extends Model
         'featured_image',
         'category',
         'tags',
-        'is_publised',
+        'is_published',
         'published_at'
     ];
 
