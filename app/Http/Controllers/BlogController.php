@@ -16,7 +16,7 @@ class BlogController extends Controller
             ->where('is_deleted', 0)
             ->withCount([
                 'comments',
-                'reactions as likes_count' => fn ($query) => $query->where('type', 'like'),
+                'reactions as likes_count' => fn($query) => $query->where('type', 'like'),
             ])
             ->latest()
             ->get();
@@ -24,7 +24,7 @@ class BlogController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Blogs fetched successfully',
-            'data' => $blogs->map(fn (Blog $blog) => $this->transformBlog($blog)),
+            'data' => $blogs->map(fn(Blog $blog) => $this->transformBlog($blog)),
         ], 200);
     }
 
@@ -43,7 +43,7 @@ class BlogController extends Controller
             ->where('is_deleted', 0)
             ->withCount([
                 'comments',
-                'reactions as likes_count' => fn ($query) => $query->where('type', 'like'),
+                'reactions as likes_count' => fn($query) => $query->where('type', 'like'),
             ])
             ->first();
 
@@ -88,7 +88,7 @@ class BlogController extends Controller
         $blog = Blog::create($validated);
         $blog->loadCount([
             'comments',
-            'reactions as likes_count' => fn ($query) => $query->where('type', 'like'),
+            'reactions as likes_count' => fn($query) => $query->where('type', 'like'),
         ]);
 
         return response()->json([
@@ -165,7 +165,7 @@ class BlogController extends Controller
         $blog->update($validated);
         $blog->refresh()->loadCount([
             'comments',
-            'reactions as likes_count' => fn ($query) => $query->where('type', 'like'),
+            'reactions as likes_count' => fn($query) => $query->where('type', 'like'),
         ]);
 
         return response()->json([
@@ -213,7 +213,7 @@ class BlogController extends Controller
         ]);
         $blog->loadCount([
             'comments',
-            'reactions as likes_count' => fn ($query) => $query->where('type', 'like'),
+            'reactions as likes_count' => fn($query) => $query->where('type', 'like'),
         ]);
 
         return response()->json([
@@ -237,7 +237,7 @@ class BlogController extends Controller
             ->with('author:id,name')
             ->withCount([
                 'comments',
-                'reactions as likes_count' => fn ($query) => $query->where('type', 'like'),
+                'reactions as likes_count' => fn($query) => $query->where('type', 'like'),
             ])
             ->latest('published_at')
             ->get();
@@ -245,7 +245,7 @@ class BlogController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Blogs fetched successfully',
-            'data' => $blogs->map(fn (Blog $blog) => $this->transformBlog($blog))
+            'data' => $blogs->map(fn(Blog $blog) => $this->transformBlog($blog))
         ], 200);
     }
 
@@ -263,7 +263,7 @@ class BlogController extends Controller
             ->with('author:id,name')
             ->withCount([
                 'comments',
-                'reactions as likes_count' => fn ($query) => $query->where('type', 'like'),
+                'reactions as likes_count' => fn($query) => $query->where('type', 'like'),
             ])
             ->latest('published_at')
             ->get();
@@ -271,14 +271,14 @@ class BlogController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Blogs fetched successfully',
-            'data' => $blogs->map(fn (Blog $blog) => $this->transformBlog($blog))
+            'data' => $blogs->map(fn(Blog $blog) => $this->transformBlog($blog))
         ], 200);
     }
 
     private function normalizeTags(array $tags): array
     {
         return array_values(array_filter(array_map(
-            fn ($tag) => Str::of((string) $tag)->trim()->lower()->value(),
+            fn($tag) => Str::of((string) $tag)->trim()->lower()->value(),
             $tags
         )));
     }
@@ -301,7 +301,7 @@ class BlogController extends Controller
             'reading_time' => $blog->reading_time,
             'likes_count' => (int) ($blog->likes_count ?? 0),
             'comments_count' => (int) ($blog->comments_count ?? 0),
-            'author' => $blog->relationLoaded('author') && $blog->author
+            'author' => $blog->author
                 ? [
                     'id' => $blog->author->id,
                     'name' => $blog->author->name,
