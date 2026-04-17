@@ -18,7 +18,7 @@ PulsePress is a modern personal blogging platform built with Laravel, Blade, and
 - Backend: Laravel 12, PHP 8.2+
 - Frontend: Blade templates, vanilla JavaScript, Tailwind CSS, Vite
 - Auth: Laravel Sanctum
-- Database: SQLite by default, with MySQL-compatible Laravel configuration available
+- Database: MySQL-compatible Laravel configuration
 
 ## Screens and Features
 
