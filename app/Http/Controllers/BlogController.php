@@ -67,7 +67,7 @@ class BlogController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'featured_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'featured_image' => 'nullable|mimes:jpg,jpeg,png,webp,gif,avif,heic,heif|max:2048',
             'category' => 'required|string|max:100',
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:50',
