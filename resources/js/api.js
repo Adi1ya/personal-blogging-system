@@ -119,6 +119,7 @@ export const publicApi = {
     blogDetail: (slug) => unwrap(api.get(`/public/blogs/${slug}`)),
     profile: (id) => unwrap(api.get(`/public/profiles/${id}`)),
     categories: () => unwrap(api.get('/public/categories')),
+    tags: () => unwrap(api.get('/public/tags')),
 };
 
 export const engagementApi = {

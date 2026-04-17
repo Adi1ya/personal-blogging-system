@@ -83,7 +83,7 @@ function createBlogCard(blog, options = {}) {
     qs('.blog-card-reading', node).textContent = `${blog.reading_time ?? 1} min read`;
     qs('.blog-card-likes', node).textContent = `${blog.likes_count ?? 0} likes`;
     qs('.blog-card-comments', node).textContent = `${blog.comments_count ?? 0} comments`;
-    qs('.blog-card-tags', node).innerHTML = (blog.tags ?? []).slice(0, 4).map((tag) => `<span class="tag-chip">${escapeHtml(tag)}</span>`).join('');
+    qs('.blog-card-tags', node).innerHTML = (blog.tags ?? []).slice(0, 4).map((tag) => `<button type="button" class="tag-chip" data-tag-filter="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`).join('');
     if (blog.featured_image) {
         qs('.blog-card-image', node).src = blog.featured_image;
         qs('.blog-card-image', node).alt = blog.title;
@@ -162,27 +162,45 @@ async function initHomePage() {
     const search = qs('#feed-search');
     const category = qs('#feed-category');
     const pills = qs('#category-pills');
-    const feed = { page: 1, hasMore: false, search: '', category: '' };
+    const feed = { page: 1, hasMore: false, search: '', category: '', tag: '' };
     renderSkeletons(grid);
-    const categoryResponse = await publicApi.categories();
+    const [categoryResponse, tagResponse] = await Promise.all([publicApi.categories(), publicApi.tags()]);
     const categories = categoryResponse.data ?? [];
+    const tags = tagResponse.data ?? [];
     category.innerHTML += categories.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join('');
-    pills.innerHTML = categories.slice(0, 8).map((item) => `<button type="button" class="tag-chip" data-category-pill="${escapeHtml(item)}">${escapeHtml(item)}</button>`).join('');
+    pills.innerHTML = [
+        '<button type="button" class="tag-chip" data-tag-pill="">All topics</button>',
+        ...tags.slice(0, 8).map((item) => `<button type="button" class="tag-chip" data-tag-pill="${escapeHtml(item)}">${escapeHtml(item)}</button>`),
+    ].join('');
 
     const load = async (append = false) => {
-        const response = await publicApi.feed({ page: feed.page, category: feed.category || undefined, search: feed.search || undefined });
+        const response = await publicApi.feed({
+            page: feed.page,
+            category: feed.category || undefined,
+            tag: feed.tag || undefined,
+            search: feed.search || undefined,
+        });
         const items = response.data ?? [];
         if (!append) grid.innerHTML = '';
         items.forEach((blog) => grid.appendChild(createBlogCard(blog)));
         empty.classList.toggle('hidden', append || items.length > 0);
         feed.hasMore = Boolean(response.meta?.has_more);
         loadMore.classList.toggle('hidden', !feed.hasMore);
+        qsa('[data-tag-filter]', grid).forEach((button) => button.addEventListener('click', async () => {
+            feed.tag = button.dataset.tagFilter ?? '';
+            feed.page = 1;
+            await load();
+            pills.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }));
+        qsa('[data-tag-pill]', pills).forEach((button) => {
+            button.classList.toggle('bg-slate-950', (button.dataset.tagPill ?? '') === feed.tag);
+            button.classList.toggle('text-white', (button.dataset.tagPill ?? '') === feed.tag);
+        });
     };
 
     await load();
-    qsa('[data-category-pill]', pills).forEach((button) => button.addEventListener('click', async () => {
-        feed.category = button.dataset.categoryPill;
-        category.value = feed.category;
+    qsa('[data-tag-pill]', pills).forEach((button) => button.addEventListener('click', async () => {
+        feed.tag = button.dataset.tagPill ?? '';
         feed.page = 1;
         await load();
     }));

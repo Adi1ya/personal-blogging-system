@@ -29,6 +29,10 @@ class PublicContentController extends Controller
             $query->where('category', Str::lower($request->string('category')->value()));
         }
 
+        if ($request->filled('tag')) {
+            $query->whereJsonContains('tags', Str::lower($request->string('tag')->value()));
+        }
+
         if ($request->filled('search')) {
             $search = $request->string('search')->value();
             $query->where(function ($builder) use ($search) {
@@ -184,6 +188,26 @@ class PublicContentController extends Controller
             'status' => true,
             'message' => 'Categories fetched successfully',
             'data' => $categories,
+        ]);
+    }
+
+    public function tags()
+    {
+        $tags = Blog::query()
+            ->where('is_deleted', false)
+            ->where('is_published', true)
+            ->pluck('tags')
+            ->flatten(1)
+            ->filter(fn ($tag) => filled($tag))
+            ->map(fn ($tag) => Str::lower((string) $tag))
+            ->unique()
+            ->sort()
+            ->values();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Tags fetched successfully',
+            'data' => $tags,
         ]);
     }
 

@@ -14,6 +14,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/public/blogs/{blog:slug}', [PublicContentController::class, 'show']);
     Route::get('/public/profiles/{user}', [PublicContentController::class, 'profile']);
     Route::get('/public/categories', [PublicContentController::class, 'categories']);
+    Route::get('/public/tags', [PublicContentController::class, 'tags']);
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
